@@ -1,52 +1,94 @@
-import { useDispatch, useSelector } from 'react-redux'
-import toast from 'react-hot-toast'
-import { FileText, PlayCircle } from 'lucide-react'
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { Play } from "lucide-react";
 import {
   setFilter,
   toggleExpand,
   approveApplication,
   rejectApplication,
   selectFilteredVerifications,
-} from '../features/verification/verificationSlice'
-import PageHeader from '../components/common/PageHeader'
-import FilterTabs from '../components/common/FilterTabs'
+} from "../features/verification/verificationSlice";
+import PageHeader from "../components/common/PageHeader";
+import FilterTabs from "../components/common/FilterTabs";
 
 const filterTabs = [
-  { label: 'All(5)', value: 'all' },
-  { label: 'Today(2)', value: 'today' },
-  { label: 'Re-Submitted', value: 'resubmitted' },
-]
+  { label: "All(5)", value: "all" },
+  { label: "Today(2)", value: "today" },
+  { label: "Re-Submitted", value: "resubmitted" },
+];
 
-const docIcons = {
-  'National ID': '🪪',
-  'Passport': '📘',
-  'Bank Statement': '🏦',
-  'Driving License': '🚗',
-}
+// ─── Social platform config ───────────────────────────────────────
+const socialPlatforms = [
+  {
+    key: "instagram",
+    label: "Instagram",
+    color: "text-pink-500 bg-pink-50",
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+      </svg>
+    ),
+  },
+  {
+    key: "facebook",
+    label: "Facebook",
+    color: "text-blue-600 bg-blue-50",
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+      </svg>
+    ),
+  },
+  {
+    key: "youtube",
+    label: "YouTube",
+    color: "text-red-500 bg-red-50",
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+      </svg>
+    ),
+  },
+  {
+    key: "spotify",
+    label: "Spotify",
+    color: "text-green-600 bg-green-50",
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+      </svg>
+    ),
+  },
+];
 
-const portfolioColors = ['bg-purple-200', 'bg-green-300', 'bg-pink-200']
-
+// ─── Individual verification card ────────────────────────────────
 function VerificationCard({ app }) {
-  const dispatch = useDispatch()
-  const expandedId = useSelector(s => s.verification.expandedId)
-  const isExpanded = expandedId === app.id
+  const dispatch = useDispatch();
+  const expandedId = useSelector((s) => s.verification.expandedId);
+  const isExpanded = expandedId === app.id;
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [activeImg, setActiveImg] = useState(0);
 
   const handleApprove = () => {
-    dispatch(approveApplication(app.id))
-    toast.success(`${app.name} approved!`)
-  }
-
+    dispatch(approveApplication(app.id));
+    toast.success(`${app.name} approved!`);
+  };
   const handleReject = () => {
-    dispatch(rejectApplication(app.id))
-    toast.error(`${app.name} rejected.`)
-  }
+    dispatch(rejectApplication(app.id));
+    toast.error(`${app.name} rejected.`);
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-3">
-      {/* Header row */}
+      {/* ── Collapsed header row ── */}
       <div className="flex items-center justify-between px-5 py-4">
         <div className="flex items-center gap-3">
-          <img src={app.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+          <img
+            src={app.avatar}
+            alt=""
+            className="w-10 h-10 rounded-full object-cover"
+          />
           <div>
             <p className="font-bold text-gray-900 text-sm">{app.name}</p>
             <p className="text-xs text-gray-400">
@@ -55,117 +97,349 @@ function VerificationCard({ app }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {!isExpanded && (
-            <button
-              onClick={() => dispatch(toggleExpand(app.id))}
-              className="btn-secondary text-xs px-4 py-2"
-            >
-              Expand
-            </button>
-          )}
-          <button onClick={handleReject} className="btn-danger text-xs px-4 py-2">Reject</button>
-          <button onClick={handleApprove} className="btn-success text-xs px-4 py-2">Approve</button>
+          <button
+            onClick={() => dispatch(toggleExpand(app.id))}
+            className="btn-secondary text-xs px-4 py-2"
+          >
+            {isExpanded ? "Collapse" : "Expand"}
+          </button>
+          <button
+            onClick={handleReject}
+            className="btn-danger text-xs px-4 py-2"
+          >
+            Reject
+          </button>
+          <button
+            onClick={handleApprove}
+            className="btn-success text-xs px-4 py-2"
+          >
+            Approve
+          </button>
         </div>
       </div>
 
-      {/* Expanded content */}
+      {/* ── Expanded content ── */}
       {isExpanded && (
-        <div className="px-5 pb-5 border-t border-gray-100">
-          <div className="flex gap-10 mt-4">
-            {/* Profile Info */}
-            <div className="flex-1">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                Profile Information
-              </p>
-              {[
-                ['Full Name', app.profile.fullName],
-                ['NIC', app.profile.nic],
-                ['Phone', app.profile.phone],
-                ['Category', app.profile.category],
-                ['Full Name', app.profile.fullName],
-                ['NIC', app.profile.nic],
-                ['Phone', app.profile.phone],
-              ].map(([label, value], i) => (
-                <div key={i} className="flex justify-between border-b border-gray-100 py-2.5">
-                  <span className="text-sm text-gray-400">{label}</span>
-                  <span className="text-sm font-semibold text-gray-800">{value}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Documents & Portfolio */}
-            <div className="flex-1">
-              {/* Documents */}
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                Documents
-              </p>
-              <div className="grid grid-cols-4 gap-2 mb-6">
-                {app.documents.map((doc, i) => (
-                  <button
-                    key={i}
-                    className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary hover:bg-primary-light transition-colors"
-                  >
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <FileText size={18} className="text-primary" />
+        <div className="border-t border-gray-100 p-5">
+          <div className="flex gap-6">
+            {/* LEFT — 5 data sections */}
+            <div className="flex-1 space-y-4">
+              {/* 1. Basic Info */}
+              <div className="bg-gray-50 rounded-2xl p-5">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
+                  Basic Info
+                </h3>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-0">
+                  {[
+                    ["Full Name", app.profile.fullName],
+                    ["Stage Name", app.profile.stageName],
+                    ["Location", app.profile.location],
+                    ["Phone", app.profile.phone],
+                    ["Email", app.profile.email],
+                    ["Category", app.profile.category],
+                    ["Date of Birth", app.profile.dateOfBirth],
+                    ["Genres", app.profile.genres],
+                  ].map(([label, value], i) => (
+                    <div
+                      key={i}
+                      className="border-b border-gray-100 py-2.5 last:border-0"
+                    >
+                      <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {value || "—"}
+                      </p>
                     </div>
-                    <span className="text-xs text-gray-600 text-center leading-tight">{doc}</span>
-                  </button>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              {/* Portfolio */}
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                Portfolio
-              </p>
-              <div className="grid grid-cols-4 gap-2">
-                {app.portfolio.map((item, i) => (
-                  <div
-                    key={i}
-                    className={`h-16 rounded-xl flex items-center justify-center cursor-pointer ${
-                      item === 'video'
-                        ? 'bg-gray-700'
-                        : portfolioColors[i % portfolioColors.length]
-                    }`}
-                  >
-                    {item === 'video' && (
-                      <div className="flex flex-col items-center gap-1">
-                        <PlayCircle size={20} className="text-white" />
-                        <span className="text-white text-xs font-bold">VIDEO</span>
+              {/* 2. Uploaded Documents */}
+              <div className="bg-gray-50 rounded-2xl p-5">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
+                  Uploaded Documents
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {app.documents
+                    .filter((d) => d.uploaded)
+                    .map((doc, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border-2 border-primary bg-primary-light"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="w-5 h-5 text-primary"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={1.5}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-xs font-semibold text-gray-700 text-center leading-tight">
+                          {doc.label}
+                        </span>
+                        <span className="text-[10px] text-green-600 font-bold">
+                          ✓ Uploaded
+                        </span>
+                      </div>
+                    ))}
+                  {app.documents.filter((d) => d.uploaded).length === 0 && (
+                    <p className="text-sm text-gray-400">
+                      No documents uploaded.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. Portfolio & Videos */}
+              <div className="bg-gray-50 rounded-2xl p-5">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
+                  Portfolio & Videos
+                </h3>
+                {app.portfolio.images?.length > 0 || app.portfolio.video ? (
+                  <div className="grid grid-cols-4 gap-2">
+                    {app.portfolio.images.map((img, i) => (
+                      <div
+                        key={i}
+                        className="relative rounded-xl overflow-hidden cursor-pointer"
+                        style={{ paddingBottom: "100%" }}
+                        onClick={() => {
+                          setActiveImg(i);
+                          setGalleryOpen(true);
+                        }}
+                      >
+                        <img
+                          src={img}
+                          alt=""
+                          className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform"
+                        />
+                      </div>
+                    ))}
+                    {app.portfolio.video && (
+                      <div
+                        className="relative rounded-xl overflow-hidden bg-gray-800"
+                        style={{ paddingBottom: "100%" }}
+                      >
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                          <Play size={18} className="text-white" />
+                          <span className="text-white text-[10px] font-bold tracking-widest">
+                            VIDEO
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    No portfolio uploaded.
+                  </p>
+                )}
+              </div>
+
+              {/* 4. Pricing */}
+              {app.pricing && (
+                <div className="bg-gray-50 rounded-2xl p-5">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
+                    Pricing
+                  </h3>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-0 mb-3">
+                    {[
+                      [
+                        "Base Price",
+                        `LKR ${app.pricing.basePrice.toLocaleString()}`,
+                      ],
+                      [
+                        "Per Hour",
+                        `LKR ${app.pricing.pricePerHour.toLocaleString()}`,
+                      ],
+                      ["Travel Radius", `${app.travelRadius} km`],
+                    ].map(([label, value], i) => (
+                      <div
+                        key={i}
+                        className="border-b border-gray-100 py-2.5 last:border-0"
+                      >
+                        <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">Add-ons</p>
+                  <div className="flex flex-wrap gap-2">
+                    {app.pricing.addOns.map((a, i) => (
+                      <span
+                        key={i}
+                        className="text-xs bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full"
+                      >
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 5. Social Links */}
+              {app.socialLinks && (
+                <div className="bg-gray-50 rounded-2xl p-5">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
+                    Social Media Links
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {socialPlatforms.map(({ key, label, icon, color }) => {
+                      const url = app.socialLinks[key];
+                      return (
+                        <div key={key} className="flex items-center gap-2.5">
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${url ? color : "text-gray-300 bg-gray-100"}`}
+                          >
+                            {icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-400">{label}</p>
+                            {url ? (
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs font-semibold text-primary hover:underline truncate block"
+                              >
+                                {url.replace("https://", "")}
+                              </a>
+                            ) : (
+                              <p className="text-xs text-gray-300">
+                                Not provided
+                              </p>
+                            )}
+                          </div>
+                          {url && (
+                            <span className="text-[10px] bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded-full shrink-0">
+                              ✓
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* end LEFT */}
+
+            {/* RIGHT SIDEBAR — documents checklist + decision */}
+            <div className="w-52 shrink-0 space-y-4">
+              {/* Documents checklist */}
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
+                  Documents
+                </h3>
+                <div className="space-y-2.5">
+                  {app.documents.map((doc, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">{doc.label}</span>
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          doc.uploaded
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-200 text-gray-400"
+                        }`}
+                      >
+                        {doc.uploaded ? "✓" : "—"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* NIC quick view */}
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
+                  NIC
+                </h3>
+                <p className="text-sm font-bold text-gray-900">
+                  {app.profile.nic}
+                </p>
+              </div>
+
+              {/* Decision */}
+              <div className="bg-gray-900 rounded-2xl p-4 space-y-2.5">
+                <p className="text-xs font-bold text-white">Decision</p>
+                <p className="text-[11px] text-gray-400 leading-relaxed">
+                  Review all details before approving.
+                </p>
+                <button
+                  onClick={handleApprove}
+                  className="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-green-600 transition-colors"
+                >
+                  ✓ Approve
+                </button>
+                <button
+                  onClick={handleReject}
+                  className="w-full bg-red-500/20 text-red-400 border border-red-500/30 font-semibold py-2.5 rounded-xl text-xs hover:bg-red-500/30 transition-colors"
+                >
+                  ✗ Reject
+                </button>
+              </div>
+            </div>
+            {/* end SIDEBAR */}
+          </div>
+
+          {/* Gallery lightbox */}
+          {galleryOpen && app.portfolio.images?.length > 0 && (
+            <div
+              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+              onClick={() => setGalleryOpen(false)}
+            >
+              <img
+                src={app.portfolio.images[activeImg]}
+                alt=""
+                className="max-h-[85vh] max-w-[85vw] rounded-xl object-contain"
+              />
+              <div className="absolute bottom-8 flex gap-3">
+                {app.portfolio.images.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImg(i);
+                    }}
+                    className={`w-2 h-2 rounded-full transition-colors ${i === activeImg ? "bg-white" : "bg-white/40"}`}
+                  />
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Collapse button */}
-          <button
-            onClick={() => dispatch(toggleExpand(app.id))}
-            className="mt-4 text-xs text-gray-400 hover:text-gray-700 underline"
-          >
-            Collapse
-          </button>
+          )}
         </div>
       )}
     </div>
-  )
+  );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────
 export default function Verification() {
-  const dispatch = useDispatch()
-  const filter = useSelector(s => s.verification.filter)
-  const filtered = useSelector(selectFilteredVerifications)
-  const total = useSelector(s => s.verification.list.length)
+  const dispatch = useDispatch();
+  const filter = useSelector((s) => s.verification.filter);
+  const filtered = useSelector(selectFilteredVerifications);
+  const total = useSelector((s) => s.verification.list.length);
 
   return (
     <div>
       <PageHeader
         title="Verification"
-        subtitle={`${total} application${total !== 1 ? 's' : ''} awaiting review.`}
+        subtitle={`${total} application${total !== 1 ? "s" : ""} awaiting review.`}
       />
 
-      <FilterTabs tabs={filterTabs} active={filter} onChange={v => dispatch(setFilter(v))} />
+      <FilterTabs
+        tabs={filterTabs}
+        active={filter}
+        onChange={(v) => dispatch(setFilter(v))}
+      />
 
       <div className="mt-5">
         {filtered.length === 0 ? (
@@ -173,9 +447,9 @@ export default function Verification() {
             No applications to review.
           </div>
         ) : (
-          filtered.map(app => <VerificationCard key={app.id} app={app} />)
+          filtered.map((app) => <VerificationCard key={app.id} app={app} />)
         )}
       </div>
     </div>
-  )
+  );
 }
