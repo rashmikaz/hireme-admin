@@ -627,42 +627,46 @@ export default function ArtistDetail() {
         </div>
       )}
 
-      {/* Cover */}
-      <div className="relative h-56 rounded-2xl overflow-hidden bg-gray-200">
-        {artist.coverImage ? (
+      {/* Cover + Avatar hero — avatar sits ON TOP of cover, not hidden behind it */}
+      <div className="relative mb-16">
+        {/* Cover photo */}
+        <div className="h-48 md:h-56 rounded-2xl overflow-hidden bg-gray-200">
+          {artist.coverImage ? (
+            <img
+              src={artist.coverImage}
+              alt="cover"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900" />
+          )}
+          {artist.status === "suspended" && (
+            <div className="absolute inset-0 rounded-2xl bg-gray-900/60 flex items-center justify-center">
+              <span className="text-white font-bold text-lg tracking-widest uppercase opacity-80">
+                ⛔ Account Suspended
+              </span>
+            </div>
+          )}
+        </div>
+        {/* Avatar — absolutely positioned over bottom of cover */}
+        <div className="absolute -bottom-12 left-6">
           <img
-            src={artist.coverImage}
-            alt="cover"
-            className="w-full h-full object-cover"
+            src={artist.avatar}
+            alt={artist.name}
+            className={`w-24 h-24 rounded-full object-cover border-4 border-white shadow-xl ${artist.status === "suspended" ? "grayscale opacity-70" : ""}`}
           />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900" />
-        )}
-        {artist.status === "suspended" && (
-          <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center">
-            <span className="text-white font-bold text-lg tracking-widest uppercase opacity-80">
-              ⛔ Account Suspended
-            </span>
-          </div>
-        )}
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* LEFT */}
         <div className="w-full lg:w-72 shrink-0 space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 pt-0 pb-6 -mt-8">
-            <div className="flex justify-center -mt-10 mb-3">
-              <img
-                src={artist.avatar}
-                alt={artist.name}
-                className={`w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg ${artist.status === "suspended" ? "grayscale opacity-70" : ""}`}
-              />
-            </div>
-            <div className="text-center mb-3">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 pt-5 pb-6">
+            <div className="mb-3">
               <h1 className="text-2xl font-extrabold text-gray-900 mb-1">
                 {artist.name}
               </h1>
-              <div className="flex items-center justify-center gap-1 mb-3">
+              <div className="flex items-center gap-1 mb-3">
                 <Star size={14} className="text-yellow-400 fill-yellow-400" />
                 <span className="font-bold text-gray-700 text-sm">
                   {artist.rating}
@@ -674,7 +678,7 @@ export default function ArtistDetail() {
               <StatusBadge status={artist.status} />
             </div>
             {artist.tags?.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 justify-center mb-4">
+              <div className="flex flex-wrap gap-1.5 mb-4">
                 {artist.tags.map((t, i) => (
                   <span
                     key={i}
@@ -685,7 +689,7 @@ export default function ArtistDetail() {
                 ))}
               </div>
             )}
-            <p className="text-xs text-gray-500 text-center leading-relaxed mb-4">
+            <p className="text-xs text-gray-500 leading-relaxed mb-4">
               {artist.bio}
             </p>
             <div className="mb-5">
@@ -697,14 +701,9 @@ export default function ArtistDetail() {
               </div>
               <p className="text-xs text-gray-400">{artist.priceRange}</p>
             </div>
-            <div className="flex gap-2">
-              <button className="flex-1 bg-primary text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-dark transition-colors">
-                Bookings ({artist.bookings})
-              </button>
-              <button className="flex-1 border-2 border-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">
-                Edit Profile
-              </button>
-            </div>
+            <button className="w-full bg-primary text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-dark transition-colors">
+              Bookings ({artist.bookings})
+            </button>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
@@ -834,7 +833,7 @@ export default function ArtistDetail() {
         </div>
 
         {/* RIGHT */}
-        <div className="flex-1 space-y-5 -mt-8 pt-12">
+        <div className="flex-1 space-y-5">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Overview</h2>
             <div className="flex items-center gap-4 mb-5 text-sm text-gray-500">
