@@ -1,18 +1,19 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import AdminLayout from '../components/layout/AdminLayout'
-import ProtectedRoute from './ProtectedRoute'
-import Login from '../pages/Login'
-import Dashboard from '../pages/Dashboard'
-import Artists from '../pages/Artists'
-import ArtistDetail from '../pages/ArtistDetail'
-import Verification from '../pages/Verification'
-import Customers from '../pages/Customers'
-import Bookings from '../pages/Bookings'
-import Settings from '../pages/Settings'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import AdminLayout from "../components/layout/AdminLayout";
+import ProtectedRoute from "./ProtectedRoute";
+import Login from "../pages/Login";
+import Dashboard from "../pages/Dashboard";
+import Artists from "../pages/Artists";
+import ArtistDetail from "../pages/ArtistDetail";
+import Verification from "../pages/Verification";
+import Customers from "../pages/Customers";
+import CustomerDetail from "../pages/CustomerDetail";
+import Bookings from "../pages/Bookings";
+import Settings from "../pages/Settings";
 
 export default function AppRouter() {
-  const isAuthenticated = useSelector(s => s.auth.isAuthenticated)
+  const isAuthenticated = useSelector((s) => s.auth.isAuthenticated);
 
   return (
     <BrowserRouter>
@@ -34,11 +35,12 @@ export default function AppRouter() {
           <Route path="artists/:id" element={<ArtistDetail />} />
           <Route path="verification" element={<Verification />} />
           <Route path="customers" element={<Customers />} />
+          <Route path="customers/:id" element={<CustomerDetail />} />
           <Route path="bookings" element={<Bookings />} />
           <Route path="settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
