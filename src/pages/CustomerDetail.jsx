@@ -145,9 +145,9 @@ export default function CustomerDetail() {
         </div>
       )}
 
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* ── LEFT SIDEBAR ── */}
-        <div className="w-64 shrink-0 space-y-4">
+        <div className="w-full lg:w-64 shrink-0 space-y-4">
           {/* Profile card */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center text-center">
             <img

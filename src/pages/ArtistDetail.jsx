@@ -183,7 +183,7 @@ export default function ArtistDetail() {
         </div>
 
         {/* Two columns: left = submitted data, right = sidebar */}
-        <div className="flex gap-7">
+        <div className="flex flex-col lg:flex-row gap-7">
           {/* ── LEFT: submitted data only, no form chrome ── */}
           <div className="flex-1 space-y-5">
             {/* ── Section 1: Basic Info ── */}
@@ -455,7 +455,7 @@ export default function ArtistDetail() {
           {/* end LEFT */}
 
           {/* ── RIGHT SIDEBAR ── */}
-          <div className="w-60 shrink-0 space-y-4">
+          <div className="w-full lg:w-60 shrink-0 space-y-4">
             {/* Applicant info */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">
@@ -647,9 +647,9 @@ export default function ArtistDetail() {
         )}
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* LEFT */}
-        <div className="w-72 shrink-0 space-y-4">
+        <div className="w-full lg:w-72 shrink-0 space-y-4">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 pt-0 pb-6 -mt-8">
             <div className="flex justify-center -mt-10 mb-3">
               <img

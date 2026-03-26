@@ -18,7 +18,6 @@ const filterTabs = [
   { label: "Re-Submitted", value: "resubmitted" },
 ];
 
-// ─── Social platform config ───────────────────────────────────────
 const socialPlatforms = [
   {
     key: "instagram",
@@ -62,7 +61,6 @@ const socialPlatforms = [
   },
 ];
 
-// ─── Individual verification card ────────────────────────────────
 function VerificationCard({ app }) {
   const dispatch = useDispatch();
   const expandedId = useSelector((s) => s.verification.expandedId);
@@ -81,55 +79,55 @@ function VerificationCard({ app }) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-3">
-      {/* ── Collapsed header row ── */}
-      <div className="flex items-center justify-between px-5 py-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-4 md:px-5 py-4">
+        <div className="flex items-center gap-3 min-w-0">
           <img
             src={app.avatar}
             alt=""
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover shrink-0"
           />
-          <div>
-            <p className="font-bold text-gray-900 text-sm">{app.name}</p>
-            <p className="text-xs text-gray-400">
-              {app.category} · {app.location} — submitted {app.submittedDate}
+          <div className="min-w-0">
+            <p className="font-bold text-gray-900 text-sm truncate">
+              {app.name}
+            </p>
+            <p className="text-xs text-gray-400 truncate">
+              {app.category} · {app.location}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 ml-3">
           <button
             onClick={() => dispatch(toggleExpand(app.id))}
-            className="btn-secondary text-xs px-4 py-2"
+            className="btn-secondary text-xs px-3 py-1.5"
           >
             {isExpanded ? "Collapse" : "Expand"}
           </button>
           <button
             onClick={handleReject}
-            className="btn-danger text-xs px-4 py-2"
+            className="btn-danger  text-xs px-3 py-1.5 hidden sm:inline-flex"
           >
             Reject
           </button>
           <button
             onClick={handleApprove}
-            className="btn-success text-xs px-4 py-2"
+            className="btn-success text-xs px-3 py-1.5 hidden sm:inline-flex"
           >
             Approve
           </button>
         </div>
       </div>
 
-      {/* ── Expanded content ── */}
       {isExpanded && (
-        <div className="border-t border-gray-100 p-5">
-          <div className="flex gap-6">
-            {/* LEFT — 5 data sections */}
+        <div className="border-t border-gray-100 p-4 md:p-5">
+          <div className="flex flex-col lg:flex-row gap-5">
+            {/* LEFT */}
             <div className="flex-1 space-y-4">
-              {/* 1. Basic Info */}
-              <div className="bg-gray-50 rounded-2xl p-5">
+              {/* Basic Info */}
+              <div className="bg-gray-50 rounded-2xl p-4 md:p-5">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
                   Basic Info
                 </h3>
-                <div className="grid grid-cols-2 gap-x-8 gap-y-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-0">
                   {[
                     ["Full Name", app.profile.fullName],
                     ["Stage Name", app.profile.stageName],
@@ -153,20 +151,20 @@ function VerificationCard({ app }) {
                 </div>
               </div>
 
-              {/* 2. Uploaded Documents */}
-              <div className="bg-gray-50 rounded-2xl p-5">
+              {/* Documents */}
+              <div className="bg-gray-50 rounded-2xl p-4 md:p-5">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
                   Uploaded Documents
                 </h3>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2 md:gap-3">
                   {app.documents
                     .filter((d) => d.uploaded)
                     .map((doc, i) => (
                       <div
                         key={i}
-                        className="flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border-2 border-primary bg-primary-light"
+                        className="flex flex-col items-center gap-1.5 px-3 md:px-4 py-3 rounded-2xl border-2 border-primary bg-primary-light"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                           <svg
                             viewBox="0 0 24 24"
                             className="w-5 h-5 text-primary"
@@ -197,13 +195,13 @@ function VerificationCard({ app }) {
                 </div>
               </div>
 
-              {/* 3. Portfolio & Videos */}
-              <div className="bg-gray-50 rounded-2xl p-5">
+              {/* Portfolio */}
+              <div className="bg-gray-50 rounded-2xl p-4 md:p-5">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
                   Portfolio & Videos
                 </h3>
                 {app.portfolio.images?.length > 0 || app.portfolio.video ? (
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {app.portfolio.images.map((img, i) => (
                       <div
                         key={i}
@@ -242,13 +240,13 @@ function VerificationCard({ app }) {
                 )}
               </div>
 
-              {/* 4. Pricing */}
+              {/* Pricing */}
               {app.pricing && (
-                <div className="bg-gray-50 rounded-2xl p-5">
+                <div className="bg-gray-50 rounded-2xl p-4 md:p-5">
                   <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
                     Pricing
                   </h3>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-0 mb-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-0 mb-3">
                     {[
                       [
                         "Base Price",
@@ -285,13 +283,13 @@ function VerificationCard({ app }) {
                 </div>
               )}
 
-              {/* 5. Social Links */}
+              {/* Social Links */}
               {app.socialLinks && (
-                <div className="bg-gray-50 rounded-2xl p-5">
+                <div className="bg-gray-50 rounded-2xl p-4 md:p-5">
                   <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
                     Social Media Links
                   </h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {socialPlatforms.map(({ key, label, icon, color }) => {
                       const url = app.socialLinks[key];
                       return (
@@ -329,12 +327,26 @@ function VerificationCard({ app }) {
                   </div>
                 </div>
               )}
-            </div>
-            {/* end LEFT */}
 
-            {/* RIGHT SIDEBAR — documents checklist + decision */}
-            <div className="w-52 shrink-0 space-y-4">
-              {/* Documents checklist */}
+              {/* Mobile approve/reject buttons */}
+              <div className="flex gap-3 sm:hidden">
+                <button
+                  onClick={handleReject}
+                  className="flex-1 btn-danger  py-2.5 text-sm rounded-xl"
+                >
+                  ✗ Reject
+                </button>
+                <button
+                  onClick={handleApprove}
+                  className="flex-1 bg-green-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-green-600 transition-colors"
+                >
+                  ✓ Approve
+                </button>
+              </div>
+            </div>
+
+            {/* RIGHT SIDEBAR */}
+            <div className="w-full lg:w-52 shrink-0 space-y-4">
               <div className="bg-gray-50 rounded-2xl p-4">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
                   Documents
@@ -344,11 +356,7 @@ function VerificationCard({ app }) {
                     <div key={i} className="flex items-center justify-between">
                       <span className="text-xs text-gray-600">{doc.label}</span>
                       <span
-                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                          doc.uploaded
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-200 text-gray-400"
-                        }`}
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${doc.uploaded ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-400"}`}
                       >
                         {doc.uploaded ? "✓" : "—"}
                       </span>
@@ -357,7 +365,6 @@ function VerificationCard({ app }) {
                 </div>
               </div>
 
-              {/* NIC quick view */}
               <div className="bg-gray-50 rounded-2xl p-4">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
                   NIC
@@ -367,8 +374,7 @@ function VerificationCard({ app }) {
                 </p>
               </div>
 
-              {/* Decision */}
-              <div className="bg-gray-900 rounded-2xl p-4 space-y-2.5">
+              <div className="bg-gray-900 rounded-2xl p-4 space-y-2.5 hidden sm:block">
                 <p className="text-xs font-bold text-white">Decision</p>
                 <p className="text-[11px] text-gray-400 leading-relaxed">
                   Review all details before approving.
@@ -387,19 +393,17 @@ function VerificationCard({ app }) {
                 </button>
               </div>
             </div>
-            {/* end SIDEBAR */}
           </div>
 
-          {/* Gallery lightbox */}
           {galleryOpen && app.portfolio.images?.length > 0 && (
             <div
-              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
               onClick={() => setGalleryOpen(false)}
             >
               <img
                 src={app.portfolio.images[activeImg]}
                 alt=""
-                className="max-h-[85vh] max-w-[85vw] rounded-xl object-contain"
+                className="max-h-[85vh] max-w-full rounded-xl object-contain"
               />
               <div className="absolute bottom-8 flex gap-3">
                 {app.portfolio.images.map((_, i) => (
@@ -421,7 +425,6 @@ function VerificationCard({ app }) {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────
 export default function Verification() {
   const dispatch = useDispatch();
   const filter = useSelector((s) => s.verification.filter);
@@ -434,13 +437,13 @@ export default function Verification() {
         title="Verification"
         subtitle={`${total} application${total !== 1 ? "s" : ""} awaiting review.`}
       />
-
-      <FilterTabs
-        tabs={filterTabs}
-        active={filter}
-        onChange={(v) => dispatch(setFilter(v))}
-      />
-
+      <div className="overflow-x-auto">
+        <FilterTabs
+          tabs={filterTabs}
+          active={filter}
+          onChange={(v) => dispatch(setFilter(v))}
+        />
+      </div>
       <div className="mt-5">
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center text-gray-400 text-sm border border-gray-100 shadow-sm">
